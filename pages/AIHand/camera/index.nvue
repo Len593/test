@@ -1,0 +1,135 @@
+<template>
+	<view>
+		<CustomCamera ref="CustomCamera" :coverImageType="coverImageType" :isLoading="isLoading" :resError="resError"
+			:resSuccess="resSuccess" :photoSrc="photoSrc" @back="back" @getImage="getImage" @resetRes="resetRes" />
+	</view>
+</template>
+
+<script>
+	// #ifdef APP
+	import CustomCamera from "../components/CustomCamera/APP/index.nvue"
+	// #endif
+	// #ifdef MP-WEIXIN
+	// import CustomCamera from "../components/CustomCamera/WeChat/index.vue"
+	// #endif
+	export default {
+		components: {
+			CustomCamera
+		},
+		data() {
+			return {
+				coverImageType: 'side',
+				resError: false,
+				resSuccess: false,
+				isLoading: false,
+				photoSrc: ''
+			}
+		},
+		onLoad(options) {
+			// this.coverImageType = options.coverImageType
+		},
+		methods: {
+			back() {
+				uni.navigateBack()
+			},
+			resetRes() {
+				this.resError = false
+				this.resSuccess = false
+			},
+			getImage(res) {
+				console.log(res)
+				this.chooseImg(res)
+				// uni.navigateTo({
+				// 	url: '/pages/AIHand/AIHandRes?res=' + res
+				// })
+			},
+			chooseImg(photoRes) {
+				let that = this;
+				if (!photoRes) {
+					that.resError = true
+					return;
+				}
+
+				uni.showLoading({
+					title: "加载中...",
+				});
+				this.isLoading = true
+				uni.uploadFile({
+					url: uni.$baseUrl + "/calculate-api/api/secure/file/uploadFile",
+					filePath: photoRes,
+					name: "file",
+					header: {
+						authorization: uni.getStorageSync("token"),
+
+						// 'content-type' : 'multipart/form-data'
+					},
+					success(resc) {
+						console.log(resc, "----resc");
+						var respon = JSON.parse(resc.data);
+						if (respon.code == 0) {
+							that.photoSrc = uni.$baseImg + respon.data;
+							console.log("that.photoSrc---", that.photoSrc);
+							that.sendPhoto();
+						}
+					},
+					fail: function(e) {
+						this.isLoading = false
+						console.log(e, "---fail");
+					},
+				});
+			},
+			sendPhoto() {
+				let that = this;
+				uni.showLoading({
+					title: "加载中...",
+				});
+				uni.$reqFN({
+					url: "/calculate-api/api/secure/sysConfigure/getYuanFenInfo",
+					data: {},
+					method: 'GET',
+				}).then(sysRes => {
+					uni.showLoading({
+						title: "加载中...",
+					});
+					if (sysRes.data.code == 0) {
+						// 解密
+						console.log('sysRes.data.data==>', sysRes.data.data, );
+						let appKey = uni.$decryptAES(sysRes.data.data, 'oHiz8rXbXE1YzO9b')
+						uni.request({
+							url: "https://api.yuanfenju.com/index.php/v1/Dashuju/shouxiang",
+							data: {
+								api_key: appKey,
+								// api_key: "V87QtBA2iQlimaUlnfSBEiXgu",
+								image_url: that.photoSrc,
+							},
+							header: {
+								"Content-Type": "application/x-www-form-urlencoded",
+							},
+							method: "POST",
+							success: (res) => {
+								console.log("成功res", res);
+								if (!res || res.statusCode !== 200 || !res.data || res.data.errcode !==
+									0) {
+									that.resError = true
+								} else {
+									that.resSuccess = true
+								}
+								uni.hideLoading();
+								this.isLoading = false
+							},
+							fail: (err) => {
+								console.log("结果err", err);
+								uni.hideLoading();
+								this.isLoading = false
+							},
+						});
+					}
+				})
+			},
+		}
+	}
+</script>
+
+<style>
+
+</style>

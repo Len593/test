@@ -1,0 +1,223 @@
+<template>
+	<view>
+		<cover-image class="cover-image" :style="[{height: '48rpx',width:'32rpx', top: '108rpx',
+		left: '32rpx'}]" src="/static/imgs/goback.png" @click="handleInstruct('back')" />
+		<cover-view class="cover-image" :style="[{ height:'56rpx',width:'158rpx', top: '108rpx',
+				left: '296rpx'}]"><text style="font-size:40rpx;color:#fff;font-weight: 500;">AI测手相</text> </cover-view>
+		<live-pusher id="livePusher" ref="livePusher" class="livePusher" mode="FHD" beauty="0" whiteness="0"
+			device-position="back" :auto-focus="true" :muted="true" :enable-camera="true" :enable-mic="true"
+			:zoom="true" :style="[{height: cameraHeight ,width:'750rpx'}]">
+
+		</live-pusher>
+		<cover-image class="cover-image" :style="[{height: '1122rpx',width:'642rpx', top: '194rpx',
+		left: '74rpx'}]"
+			src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/shouxiang/aihand-hand-lan.png?x-oss-process=image/quality,Q_100" />
+		<cover-image class="cover-image" :style="[{height:'100rpx',width:'112rpx', bottom: '136rpx',
+			left: '88rpx'}]"
+			src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/shouxiang/aihand-fanzhuan.png?x-oss-process=image/quality,Q_100"
+			@click="handleInstruct('reversal')" />
+		<cover-view class="cover-image" :style="[{ height:'40rpx',width:'112rpx', bottom: '90rpx',
+				left: '94rpx'}]"><text style="font-size:28rpx;color:#fff;">翻转镜头</text> </cover-view>
+		<cover-image class="cover-image" :style="[{height:'146rpx',width:'146rpx', bottom: '90rpx',
+		left: '302rpx'}]"
+			src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/shouxiang2/aip-bt.png?x-oss-process=image/quality,Q_100"
+			@click="handleInstruct('shutter')" />
+		<cover-image class="cover-image" :style="[{height:'100rpx',width:'112rpx', bottom: '136rpx',
+		right: '88rpx'}]"
+			src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/shouxiang/aihand-photo.png?x-oss-process=image/quality,Q_100"
+			@click="handleInstruct('album')" />
+		<cover-view class="cover-image" :style="[{ height:'40rpx',width:'112rpx', bottom: '90rpx',
+				right: '84rpx'}]"><text style="font-size:28rpx;color:#fff;">上传照片</text> </cover-view>
+		<cover-image v-if="resError" class="cover-image" :style="[{height:'1042rpx',width:'710rpx', top: '292rpx',
+		left: '20rpx'}]"
+			src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/shouxiang2/aip-bg1.png?x-oss-process=image/quality,Q_100" />
+		<cover-image v-if="resError" class="cover-image2" :style="[{height:'92rpx',width:'568rpx', top: '1192rpx',
+		left: '76rpx'}]"
+			src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/shouxiang2/aip-ok1.png?x-oss-process=image/quality,Q_100"
+			@click="resetRes" />
+		<cover-image v-if="photoSrc" class="cover-image3" :style="[{height:cameraHeight,width:'750rpx', top: '0rpx',
+				left: '0rpx'}]" :src="photoSrc" />
+		<cover-view v-if="resSuccess" class="cover-image2" :style="[{ height:'40rpx',width:'252rpx', top: '258rpx',
+							left: '276rpx'}]"><text style="font-size:28rpx;color:#fff;">已拍摄，去分析</text> </cover-view>
+		<cover-image v-if="resSuccess" class="cover-image2" :style="[{height:'392rpx',width:'750rpx', bottom: '0rpx',
+		left: '0rpx'}]"
+			src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/shouxiang2/aip-bg2.png?x-oss-process=image/quality,Q_100" />
+		<cover-image v-if="resSuccess" class="cover-image2" :style="[{height:'100rpx',width:'498rpx', bottom: '136rpx',
+			left: '126rpx'}]"
+			src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/shouxiang2/aip-ok2.png?x-oss-process=image/quality,Q_100"
+			@click="toFN('/pages/AIHand/AIHandRes?res=' + photoSrc)" />
+		<cover-view v-if="resSuccess" class="cover-image2" :style="[{ height:'46rpx',width:'128rpx', bottom: '66rpx',
+					left: '312rpx'}]"><text style="font-size:32rpx;color:#3C2E17;font-weight: 500;text-decoration: underline;"
+				@click="resetRes">重新拍照</text> </cover-view>
+
+	</view>
+
+</template>
+
+<script>
+	// 这个组件仅限APP使用！！！
+	import config from '../config.js'
+	export default {
+		props: {
+			photoSrc: { //遮罩层的类型 （必须在config里面的定义的）
+				type: String,
+				default: ''
+			},
+			isLoading: { //遮罩层的类型 （必须在config里面的定义的）
+				type: Boolean,
+				default: false
+			},
+			resError: { //遮罩层的类型 （必须在config里面的定义的）
+				type: Boolean,
+				default: false
+			},
+			resSuccess: { //遮罩层的类型 （必须在config里面的定义的）
+				type: Boolean,
+				default: false
+			}
+		},
+
+		components: {},
+		data() {
+			return {
+				livePusher: null,
+				ready: true,
+				cameraHeight: '', //相机画面宽度
+				optionsHeight: '', //操作台高度
+				optionsHeight2: '',
+				coverImage: null,
+			}
+		},
+		mounted() {
+			this.cameraHeight = uni.getSystemInfoSync().screenHeight * 1.00
+			this.optionsHeight = uni.getSystemInfoSync().screenHeight * 0.16
+			this.init()
+		},
+		methods: {
+			init() {
+				this.livePusher = uni.createLivePusherContext('livePusher', this);
+				setTimeout(() => {
+					this.startPreview()
+				}, 1000)
+			},
+			toFN(url) {
+				uni.navigateTo({
+					url
+				})
+			},
+			startPreview() {
+				this.livePusher.startPreview({
+					success: () => {
+						console.log('相机初始化成功');
+						switch (plus.os.name) {
+							case 'Android':
+								break;
+							case 'iOS':
+								this.livePusher.switchCamera()
+								break
+						}
+					},
+					fail: (err) => {
+						console.log(err)
+					}
+				});
+			},
+			handleInstruct(instruct) {
+				switch (instruct) {
+					// 返回
+					case 'back':
+						this.$emit('back')
+						break;
+						// 快门
+					case 'shutter':
+						if (this.isLoading) return
+						if (this.ready) {
+							this.ready = false
+							this.livePusher.snapshot({
+								success: (res) => {
+									console.log(res)
+									this.ready = true
+									this.$emit('getImage', res.message.tempImagePath)
+								}
+							})
+						}
+						break;
+						// 反转
+					case 'reversal':
+						this.livePusher.switchCamera();
+						break;
+						// 相册
+					case 'album':
+						if (this.isLoading) return
+						uni.chooseImage({
+							count: 1, //默认9
+							sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+							sourceType: ['album'], //从相册选择
+							success: (res) => {
+								this.$emit('getImage', res.tempFilePaths[0])
+							}
+						})
+						break;
+				}
+			},
+			resetRes() {
+				this.$emit('resetRes')
+				this.init()
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.camera-background {
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.3);
+	}
+
+	.cover-text {
+		color: #ffffff;
+		/* position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 99; */
+	}
+
+	.cover-image {
+		position: fixed;
+		z-index: 99;
+	}
+
+	.cover-image2 {
+		position: fixed;
+		z-index: 999;
+	}
+
+	.cover-image3 {
+		position: fixed;
+		z-index: 5;
+	}
+
+	.camera-options {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.camera-item {
+		flex: 1;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
+	}
+
+	.camera-item .camera-item-image {
+		width: 80rpx;
+		height: 80rpx;
+	}
+
+	.camera-options-center .camera-item-image {
+		width: 120rpx;
+		height: 120rpx;
+	}
+</style>

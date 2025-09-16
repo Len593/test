@@ -1,0 +1,6 @@
+framework module RCUniIMV2 {
+  umbrella header "RCUniIMV2.h"
+
+  export *
+  module * { export * }
+}

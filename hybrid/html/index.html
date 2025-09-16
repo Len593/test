@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>AI解读</title>
+  <link rel="stylesheet" href="./css/basic.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body,
+    #aiChat {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      background: url(https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/homeBg.png?x-oss-process=image/quality,Q_100) no-repeat;
+      background-size: 100% auto;
+      overflow: auto;
+    }
+
+    #AIExplain {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: 100vh;
+    }
+
+    #aiChat {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      height: 85vh;
+      width: 100vw;
+      background-color: #fffaf5;
+      border-radius: 20px 20px 0px 0px;
+    }
+
+    .chat_top_box {
+      flex: 1;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      background: #f8f8f8;
+    }
+
+    .button-g {
+      display: flex;
+      justify-content: space-between;
+      padding: 0px 10px;
+      padding-bottom: 18px;
+    }
+
+    .button-g-b {
+      width: 28px;
+      height: 28px;
+    }
+
+    .chat_list {
+      padding: 10px 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat_bubble_box {
+      display: flex;
+      align-items: flex-start;
+      margin: 16px 0;
+      padding: 0 16px;
+      text-align: justify;
+    }
+
+    .chat_bubble_box :last-child {
+      margin-bottom: 0;
+    }
+
+    .chat_bubble_box.textRight {
+      justify-content: flex-end;
+    }
+
+    .chat_bubble_box.textRight .chat_bubble_right {
+      margin-right: 8px;
+      margin-left: 0;
+      padding: 10px;
+    }
+
+    .chat_bubble_box.textRight .avatar {
+      margin: 0;
+    }
+
+    .chat_bottom_box {
+      position: relative;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0);
+    }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+      background: #f5f5f5;
+      border-radius: 16px;
+      padding: 4px 8px;
+      transition: all 0.3s ease;
+      width: 90%;
+      border-radius: 12.716px;
+      background: #fff;
+      box-shadow: 1.06px 3.179px 4.239px 0px rgba(167, 167, 167, 0.25);
+    }
+
+    .chat-input {
+      flex: 1;
+      min-height: 16px;
+      max-height: 80px;
+      font-size: 14px;
+      line-height: 18px;
+      padding: 4px 0;
+      background: #fff;
+      border: none;
+    }
+
+    .send-button {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #007aff;
+      border-radius: 50%;
+      margin-left: 6px;
+    }
+
+    .send-button.disabled {
+      background: #ccc;
+      opacity: 0.7;
+    }
+
+    .send-icon {
+      width: 100%;
+      height: 100%;
+    }
+
+    .chat_bubble {
+      max-width: 80%;
+      background: #fff;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-left: 8px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      padding: 10px;
+    }
+
+    .chat_bubble h1,
+    .chat_bubble h2,
+    .chat_bubble h3 {
+      margin: 0;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .chat_bubble h1 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .chat_bubble h2 {
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .chat_bubble h3 {
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .chat_bubble br {
+      display: block;
+      margin: 8px 0;
+    }
+
+    .chat_bubble_right {
+      max-width: 80%;
+      background: #ffdaaf;
+      color: #fff;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      flex-shrink: 0;
+    }
+
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      margin-left: 48px;
+    }
+
+    .typing-indicator .dot {
+      width: 8px;
+      height: 8px;
+      background: #999;
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: typing 1s infinite ease-in-out;
+    }
+
+    .typing-indicator .dot:nth-child(1) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-indicator .dot:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+
+    .typing-indicator .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .top-tips {
+      color: #b39569;
+      font-family: "Source Han Serif TW";
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: normal;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .top-tips-text {
+      padding: 0px 12px;
+    }
+
+    .top-tips-after,
+    .top-tips-before {
+      background: #b39569;
+      width: 70px;
+      height: 1px;
+    }
+
+    .bm-tips {
+      color: rgba(0, 0, 0, 0.5);
+      text-align: center;
+      font-family: "Source Han Serif TW";
+      font-size: 10px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: normal;
+      letter-spacing: -0.3px;
+      padding: 10px 0px 14px;
+    }
+
+    .flex-con {
+      color: #3c2e17;
+      font-family: "Source Han Serif TW";
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    @keyframes typing {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+  </style>
+  <script type="text/javascript" src="js/vue.min.js"></script>
+  <script type="text/javascript" src="js/axios.min.js"></script>
+  <script type="text/javascript" src="js/marked.min.js"></script>
+  <script type="text/javascript" src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.1.js"></script>
+</head>
+
+<body>
+  <div id="AIExplain">
+    <div class="button-g">
+      <img class="button-g-b" src="./static/goback.png" @click="goBack" />
+      <img class="button-g-b" src="./static/delete.png" @click="onDelete" />
+    </div>
+    <div id="aiChat" class="flex-wrap flex-vertical">
+      <div class="chat_list flex-con">
+        <div class="top-tips">
+          <div class="top-tips-before"></div>
+          <div class="top-tips-text">下拉看看我们的聊天</div>
+          <div class="top-tips-after"></div>
+        </div>
+        <div class="chat_bubble_box flex-wrap" :class="item.role === 'user' ? 'textRight' : ''"
+          v-for="(item, index) in chatListData" :key="index">
+          <img v-if="item.role !== 'user'" class="avatar" src="./static/deepseek.png" />
+          <div class="flex-con" :class="item.role === 'user' ? 'chat_bubble_right' : 'chat_bubble'"
+            v-html="marked.parse(item.content)"></div>
+          <img v-if="item.role === 'user'" class="avatar" src="./static/user.png" />
+        </div>
+        <div class="typing-indicator" v-if="isLoading">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+      <div class="chat_bottom_box">
+        <div class="input-container">
+          <textarea class="chat-input" v-model="keyword" placeholder="算运相关尽管问我~" :disabled="isLoading"
+            @keypress.enter.prevent="sendDeepseek"></textarea>
+          <div @click="sendDeepseek" class="send-button" :class="{ disabled: isLoading || !keyword.trim() }">
+            <img class="send-icon" src="./static/send.png" />
+          </div>
+        </div>
+        <div class="bm-tips">对话由AI模型生成，仅供参考</div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    let _this;
+    var vm = new Vue({
+      el: "#AIExplain",
+      data: {
+        option: {},
+        chatListData: [
+          {
+            sort: 0,
+            role: "AI解读",
+            content:
+              `启运阁AI欢乐占
+—
+⚡ ​快如惊雷​：
+DeepSeek智能引擎3秒推演命理谜题
+🌌 ​趣若流云​：
+十万种卦象组合随机生成奇妙人生剧本
+✨ ​声明在先​：
+所有AI测算仅供娱乐休闲
+生活决策还请脚踏实地
+—
+​点击解锁今日运势盲盒​
+让数据流带您畅游东方奇幻宇宙`,
+          },
+        ],
+        keyword: "",
+        isLoading: false,
+        currentStreamingMessage: "",
+      },
+      watch: {
+        chatListData: {
+          handler() {
+            this.$nextTick(() => {
+              this.scrollToBottom();
+            });
+          },
+          deep: true,
+        },
+      },
+      created() {
+        this.initChatListData();
+      },
+      mounted() {
+        this.option = JSON.parse(this.GetQueryString("option")) || {};
+      },
+      methods: {
+        webviewGetMessage() {
+          // localStorage.setItem("tttt", "===>6666666");
+          // console.log(localStorage.getItem("tttt"));
+        },
+        onDelete() {
+          localStorage.setItem("AIExplainMsg", "");
+          this.chatListData = [
+            {
+              sort: 0,
+              role: "AI解读",
+              content:
+                "算天算地算人生，运来运转运亨通！AI算运，精准预测未来！一卦知天命，吉凶尽在掌握。大数据算命，科学又玄妙。算不准不要钱，算得准请点赞~",
+            },
+          ];
+        },
+        goBack() {
+          window.uni.postMessage({
+            data: { type: "goBack" },
+          });
+        },
+        initChatListData(list) {
+          // localStorage.setItem("AIExplainMsg", "");
+          let msg = localStorage.getItem("AIExplainMsg");
+          if (msg) {
+            try {
+              msg = JSON.parse(msg);
+              this.chatListData = [...msg].sort((a, b) => {
+                return a.sort - b.sort;
+              });
+            } catch (error) { }
+          }
+        },
+        scrollToBottom() {
+          let el = document.querySelector(".chat_list");
+          el.scrollTop = el.scrollHeight;
+        },
+        GetQueryString: function (name) {
+          var reg = new RegExp("(^|&|\\?)" + name + "=([^&\\?]*)(&|$)");
+          var r = window.location.href.match(reg);
+          if (r != null) return unescape(r[2]);
+          return null;
+        },
+
+        async sendDeepseek() {
+          if (this.isLoading || !this.keyword.trim()) return;
+
+          const currentMessage = this.keyword.trim();
+          let aiMessageIndex = this.chatListData.length;
+          // 添加用户消息到显示列表
+          const userMessage = {
+            sort: aiMessageIndex,
+            role: "user",
+            content: currentMessage,
+          };
+
+          let beforeTwo = this.chatListData.filter(
+            (item) => item.role === "user"
+          );
+          beforeTwo =
+            beforeTwo > 6
+              ? beforeTwo.slice(
+                this.chatListData.length - 7,
+                this.chatListData.length - 1
+              )
+              : beforeTwo;
+
+          this.chatListData.push(userMessage);
+          this.scrollToBottom();
+
+          this.keyword = "";
+          this.isLoading = true;
+
+          let _this = this;
+          // 添加AI空消息
+          aiMessageIndex = this.chatListData.length;
+          this.chatListData.push({
+            type: "deepseek",
+            content: "",
+          });
+          try {
+            axios({
+              method: "post",
+              url: this.option.apiUrl,
+              responseType: "stream", // or 'blob' depending on your needs
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.option.apiKey}`, // 官网申请的API key 有次数上限 换成自己的即可
+                Accept: "text/event-stream",
+              },
+              data: {
+                model: this.option.apiModel,
+                // 请求数据
+                messages: [...beforeTwo, userMessage].map((item) => {
+                  return {
+                    ...item,
+                    content:
+                      "你是专业的命理大师，根据以下内容算命或算运：" +
+                      item.content,
+                  };
+                }),
+                stream: true,
+                max_tokens: 8192,
+              },
+              adapter: "fetch",
+            }).then(async (response) => {
+              const stream = response.data;
+              // consume response
+              const reader = stream
+                .pipeThrough(new TextDecoderStream())
+                .getReader();
+              while (true) {
+                const { value, done } = await reader.read();
+                if (done) {
+                  _this.isLoading = false;
+                  break;
+                }
+                try {
+                  const chunk = value || " ";
+                  const lines = chunk.split("\n");
+                  // console.log(`55555555`, lines);
+                  for (const line of lines) {
+                    if (line.trim() === "") continue;
+                    if (line.startsWith("data: ")) {
+                      const jsonStr = line.slice(6);
+                      if (jsonStr.trim() === "[DONE]") continue;
+                      // console.log(`66666`, jsonStr);
+                      try {
+                        const data = JSON.parse(jsonStr);
+                        if (
+                          data.choices &&
+                          data.choices[0].delta &&
+                          data.choices[0].delta.content
+                        ) {
+                          const content = data.choices[0].delta.content;
+                          // 更新显示的消息
+                          this.$set(
+                            this.chatListData[aiMessageIndex],
+                            "content",
+                            this.chatListData[aiMessageIndex].content +
+                            content
+                          );
+                          // console.log(
+                          //   "更新显示的消息111:",
+                          //   this.chatListData[aiMessageIndex].content
+                          // );
+                          // console.log(
+                          //   "更新显示的消息222:",
+                          // this.chatListData[aiMessageIndex],
+                          //   content
+                          // );
+                          localStorage.setItem(
+                            "AIExplainMsg",
+                            JSON.stringify(this.chatListData)
+                          );
+                          this.scrollToBottom();
+                        }
+                      } catch (e) {
+                        console.error("解析JSON数据出错:", e, jsonStr);
+                      }
+                    }
+                  }
+                } catch (e) {
+                  console.error("处理数据块出错:", e);
+                }
+              }
+            });
+          } catch (error) {
+            console.error("API请求错误:", error);
+            this.$set(
+              this.chatListData[aiMessageIndex],
+              "content",
+              `抱歉，服务暂时不可用，请稍后再试。\n错误信息：${error.message}`
+            );
+            this.isLoading = false;
+            this.scrollToBottom();
+          }
+        },
+      },
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,471 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "uni-app",
+				"navigationStyle": "custom",
+				"app-plus":{
+					"pullToRefresh": {
+						"support": true,
+						"color": "#181b25",
+						"style": "circle",
+						"contentdown": {
+							"caption": "下拉可更新"
+						},
+						"contentover": {
+							"caption": "松手刷新"
+						},
+						"contentrefresh": {
+							"caption": "正在更新中"
+						}
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/coupon/coupon",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/storedValRecord/storedValRecord",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/myOrder/myOrder",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/aboutUs/aboutUs",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/my/my",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/myInfor/myInfor",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/myArchives/myArchives",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/editInfor/editInfor",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/setting/setting",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/consult/consult",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom",
+				"app-plus":{
+					"pullToRefresh": {
+						"support": true,
+						"color": "#181b25",
+						"style": "circle",
+						"contentdown": {
+							"caption": "下拉可更新"
+						},
+						"contentover": {
+							"caption": "松手刷新"
+						},
+						"contentrefresh": {
+							"caption": "正在更新中"
+						}
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/teacher/teacher",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/myWallet/myWallet",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/released/released",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/payOrder/payOrder",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/draw/draw",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/prophet/prophet",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/beacon/beacon",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/prophetDate/prophetDate",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/solveSign/solveSign",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/fortune/fortune",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/orderOk/orderOk",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/signDetail/signDetail",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/lighting/lighting",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/square/square",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom",
+				"app-plus":{
+					"pullToRefresh": {
+						"support": true,
+						"color": "#181b25",
+						"style": "circle",
+						"contentdown": {
+							"caption": "下拉可更新"
+						},
+						"contentover": {
+							"caption": "松手刷新"
+						},
+						"contentrefresh": {
+							"caption": "正在更新中"
+						}
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/squareDetail/squareDetail",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/chat/chat",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/news/news",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom",
+				"app-plus":{
+					"pullToRefresh": {
+						"support": true,
+						"color": "#181b25",
+						"style": "circle",
+						"contentdown": {
+							"caption": "下拉可更新"
+						},
+						"contentover": {
+							"caption": "松手刷新"
+						},
+						"contentrefresh": {
+							"caption": "正在更新中"
+						}
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/teacherDetail/teacherDetail",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/interactNews/interactNews",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/activeNews/activeNews",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/fuwu/fuwu",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/baZi/baZi",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/shuoMing/shuoMing",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/baZiPai/baZiPai",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/otherBg/otherBg",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/otherPay/otherPay",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/AIExplain/AIExplain",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/AIHand/AIHand",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/AIHand/camera/index",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/AIHand/AIHandRes",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/constellationGuide/constellationGuide",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/constellationGuide/constellationGuideRes",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/payPage/payPage",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+        {
+          "path": "pages/payPage/webview",
+          "style": {
+            "navigationBarTitleText": "",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "pages/payPage/qrcode",
+          "style": {
+            "navigationBarTitleText": "",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+            "path": "pages/webview/webview",
+            "style": {
+                "navigationBarTitleText": "",
+                "navigationStyle": "custom"
+            }
+        }
+    ],
+	
+	"tabBar": {
+		"color": "#999999",
+		"selectedColor": "#3e3e3e",
+		"backgroundColor": "#ffffff",
+		"borderStyle": "white",
+		"custom": true,
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/tabbar/home.svg",
+				"selectedIconPath": "static/tabbar/home.svg",
+				"text": "首页",
+				"hidden": true
+			},
+			{
+				"pagePath": "pages/square/square",
+				"iconPath": "static/tabbar/home.svg",
+				"selectedIconPath": "static/tabbar/home.svg",
+				"text": "广场",
+				"hidden": true
+			},
+			{
+				"pagePath": "pages/consult/consult",
+				"iconPath": "static/tabbar/home.svg",
+				"selectedIconPath": "static/tabbar/home.svg",
+				"text": "咨询",
+				"hidden": true
+			},
+			{
+				"pagePath": "pages/news/news",
+				"iconPath": "static/tabbar/home.svg",
+				"selectedIconPath": "static/tabbar/home.svg",
+				"text": "消息",
+				"hidden": true
+			},
+			{
+				"pagePath": "pages/my/my",
+				"iconPath": "static/tabbar/home.svg",
+				"selectedIconPath": "static/tabbar/home.svg",
+				"text": "我的",
+				"hidden": true
+			}
+		]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+            "bounce": "none",
+			"userSelect": false // 关键配置
+        }
+	},
+	"uniIdRouter": {},
+	"condition": { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [
+			{
+				"name": "", //模式名称
+				"path": "pages/index/index", //启动页面，必选
+				"query": "" //启动参数，在页面的onLoad函数里面得到
+			}
+		]
+	}
+}
