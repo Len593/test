@@ -24,7 +24,8 @@
                 mode="widthFix" />
           </view>
 
-            <view class="list s27 c1 flex-a" v-for="(item, index) in funList" :key="item.name" v-if="channelObj.channelType === 'VISA'">
+            <template v-if="channelObj.channelType === 'VISA'">
+                <view class="list s27 c1 flex-a" v-for="(item, index) in funList" :key="item.name">
                 <text style="width: 160rpx;">{{ item.name }}</text>
                 <view class="f1">
                     <input style="background: none;border: none; width: 100%;" class="s27 c1 inputCC" v-model="item.val"
@@ -59,6 +60,7 @@
                     src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/backImg.png?x-oss-process=image/quality,Q_100"
                     mode="widthFix" />
             </view>
+            </template>
 
             <view class="angle">
                 <image :class="'img' + item" :key="item" v-for="item in 4"
@@ -507,10 +509,24 @@ export default {
                 { "name": "Zimbabwe", "cn": "津巴布韦", "val1": "ZW", "val2": "ZWE" }
             ],
             isPaying: false,
+            // 新增参数
+            serviceId: '',
+            couponId: '',
+            isQuickPay: false,
         }
     },
     onLoad(options) {
-        this.businessId = options.businessId
+        this.serviceId = options.serviceId || ''
+        this.couponId = options.couponId || ''
+        this.isQuickPay = options.isQuickPay === 'true'
+        
+        // 如果是快速支付模式，businessId就是serviceId
+        if (this.isQuickPay && this.serviceId) {
+            this.businessId = this.serviceId
+        } else {
+            this.businessId = options.businessId
+        }
+        
         this.getData()
         // this.checkFN()
     },
@@ -571,21 +587,37 @@ export default {
                 mask: true
             })
 
-            this.reqFN({
-                url: '/calculate-api/api/secure/oms/pay/submit',
-                data: {
-                    cardPay: {
-                        ...cardPay,
-                        browserInfo: 'app',
-                        siteSessionId: "ei6r9vcf4b4lql5ovtud19l144",
-                        customerIp: "100000000",
-                        userAgent: "userAgent",
-                    },
-                    paymentToken,
-                    rechargePlanId: this.businessId,
-                    paymentChannelId: this.channelObj.id,
-
+            // 根据是否是快速支付选择不同的API和参数
+            const apiUrl = this.isQuickPay ? '/calculate-api/api/secure/oms/pay/quickSubmit' : '/calculate-api/api/secure/oms/pay/submit'
+            const requestData = this.isQuickPay ? {
+                paymentToken,
+                serviceId: this.serviceId,
+                paymentChannelId: this.channelObj.id,
+                device: 'APP',
+                couponId: this.couponId,
+                cardPay: {
+                    ...cardPay,
+                    browserInfo: 'app',
+                    siteSessionId: "ei6r9vcf4b4lql5ovtud19l144",
+                    customerIp: "100000000",
+                    userAgent: "userAgent",
+                }
+            } : {
+                cardPay: {
+                    ...cardPay,
+                    browserInfo: 'app',
+                    siteSessionId: "ei6r9vcf4b4lql5ovtud19l144",
+                    customerIp: "100000000",
+                    userAgent: "userAgent",
                 },
+                paymentToken,
+                rechargePlanId: this.businessId,
+                paymentChannelId: this.channelObj.id,
+            }
+
+            this.reqFN({
+                url: apiUrl,
+                data: requestData,
                 method: 'POST'
             }).then(res => {
                 this.isPaying = false
@@ -619,21 +651,24 @@ export default {
 
             const info = uni.getDeviceInfo()
 
-            this.reqFN({
-                url: '/calculate-api/api/secure/oms/pay/submit',
-                data: {
-                    // cardPay: {
-                    //     browserInfo: 'app',
-                    //     siteSessionId: "ei6r9vcf4b4lql5ovtud19l144",
-                    //     customerIp: "100000000",
-                    //     userAgent: "userAgent",
-                    // },
-                    paymentToken,
-                    rechargePlanId: this.businessId,
-                    paymentChannelId: this.channelObj.id,
-                    device: (info?.osName || 'android').toUpperCase()
+            // 根据是否是快速支付选择不同的API和参数
+            const apiUrl = this.isQuickPay ? '/calculate-api/api/secure/oms/pay/quickSubmit' : '/calculate-api/api/secure/oms/pay/submit'
+            const requestData = this.isQuickPay ? {
+                paymentToken,
+                serviceId: this.serviceId,
+                paymentChannelId: this.channelObj.id,
+                device: (info?.osName || 'android').toUpperCase(),
+                couponId: this.couponId
+            } : {
+                paymentToken,
+                rechargePlanId: this.businessId,
+                paymentChannelId: this.channelObj.id,
+                device: (info?.osName || 'android').toUpperCase()
+            }
 
-                },
+            this.reqFN({
+                url: apiUrl,
+                data: requestData,
                 method: 'POST'
             }).then(({ data: resp }) => {
 

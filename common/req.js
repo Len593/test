@@ -13,16 +13,25 @@ const reqFN = ({ url, data = {}, method = 'POST',showLoading }) => {
         //     title: '加载中...',
         //     mask: true
         // })
+        // 根据环境自动选择API地址
+        let requestUrl
+        // #ifdef H5
+        // H5环境使用代理
+        requestUrl = url
+        // #endif
+        
+        // #ifdef APP-PLUS
+        // APP环境直接请求
+        requestUrl = 'https://admins.gdxingchuan.com' + url
+        // #endif
+        
+        // #ifdef MP
+        // 小程序环境直接请求
+        requestUrl = 'https://admins.gdxingchuan.com' + url
+        // #endif
+
         uni.request({
-            
-			// APP开发环境
-            // url: 'http://8.138.94.195:8095' + url,
-			
-			// APP正式环境
-            url: 'https://admins.gdxingchuan.com' + url,
-			
-			// H5环境
-            // url,
+            url: requestUrl,
 			
             data,
 			

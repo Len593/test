@@ -162,11 +162,11 @@
             // "port" : 8080,
             "proxy" : {
                 "/calculate-api" : {
-                    "target" : "http://8.138.94.195:8095/calculate-api", //这里使用后端服务器的地址
+                    "target" : "https://admins.gdxingchuan.com", //这里使用后端服务器的地址
                     "changeOrigin" : true, //是否跨域
                     "secure" : true, // 是否支持 https 协议的代理
                     "pathRewrite" : {
-                        "^/calculate-api" : ""
+                        "^/calculate-api" : "/calculate-api"
                     }
                 },
                 "/Gongju" : {
