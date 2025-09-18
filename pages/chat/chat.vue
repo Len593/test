@@ -323,9 +323,7 @@
                             mode="widthFix" />
                         {{ toFix(showDetail.consultPrice * (100 - (couponDetail.discountRate || 0)) / 100) }}
                     </view>
-                    <view v-if="WalletBalance < showDetail.consultPrice" class="btn tc c3"
-                        @click="toFN('/pages/myWallet/myWallet')">余额不足，请充值</view>
-                    <view v-else class="btn tc c3" @click="getOrderTokenFN()">支付</view>
+                    <view class="btn tc c3" @click="showPaymentOptions()">立即支付</view>
 
                 </view>
             </template>
@@ -333,6 +331,34 @@
 
 
 
+        </fuPopup2>
+
+        <!-- 支付方式选择弹窗 -->
+        <fuPopup2 :showPopup.sync="paymentMethodPopup.show" :title="paymentMethodPopup.title">
+            <view class="payment-methods">
+                <view class="payment-option" @click="selectPaymentMethod('wallet')">
+                    <view class="option-content">
+                        <image class="option-icon" src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/money.png?x-oss-process=image/quality,Q_100" mode="widthFix" />
+                        <view class="option-text">
+                            <view class="option-title">钱包支付</view>
+                            <view class="option-desc" v-if="WalletBalance >= showDetail.consultPrice">使用账户余额支付</view>
+                            <view class="option-desc insufficient-balance" v-else>余额不足，点击充值</view>
+                        </view>
+                    </view>
+                    <image class="option-arrow" src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/backImg.png?x-oss-process=image/quality,Q_100" mode="widthFix" />
+                </view>
+                
+                <view class="payment-option" @click="selectPaymentMethod('direct')">
+                    <view class="option-content">
+                        <image class="option-icon" src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/money.png?x-oss-process=image/quality,Q_100" mode="widthFix" />
+                        <view class="option-text">
+                            <view class="option-title">在线支付</view>
+                            <view class="option-desc">支持多种支付方式</view>
+                        </view>
+                    </view>
+                    <image class="option-arrow" src="https://qiyunge-oss.oss-ap-southeast-1.aliyuncs.com/imgs/backImg.png?x-oss-process=image/quality,Q_100" mode="widthFix" />
+                </view>
+            </view>
         </fuPopup2>
 
         <fuPopup :showPopup.sync="showObj2.show" title="打赏" @sureFN="getRewardTokenFN">
@@ -420,6 +446,10 @@ export default {
             cloudUserId: "",
             OrderToken: "",
             WalletBalance: 0,
+            paymentMethodPopup: {
+                show: false,
+                title: '选择支付方式'
+            }
 
         }
     },
@@ -788,6 +818,34 @@ export default {
         toCouponFN() {
             uni.navigateTo({
                 url: '/pages/coupon/coupon?use=true'
+            })
+        },
+        showPaymentOptions() {
+            this.paymentMethodPopup.show = true
+        },
+        selectPaymentMethod(method) {
+            this.paymentMethodPopup.show = false
+            
+            if (method === 'wallet') {
+                // 钱包支付 - 检查余额
+                if (this.WalletBalance >= this.showDetail.consultPrice) {
+                    this.getOrderTokenFN()
+                } else {
+                    // 余额不足，跳转充值页面
+                    this.toFN('/pages/myWallet/myWallet')
+                }
+            } else if (method === 'direct') {
+                // 直接支付
+                this.directPayFN()
+            }
+        },
+        directPayFN() {
+            // 跳转到支付页面，传递服务ID和优惠券ID
+            const serviceId = this.showDetail.userConsultServiceId || this.showDetail.systemConsultServiceId
+            const couponId = this.couponDetail.couponsId || ''
+            
+            uni.navigateTo({
+                url: `/pages/payPage/payPage?serviceId=${serviceId}&couponId=${couponId}&isQuickPay=true`
             })
         },
         chooseFN({ item, index }) {
@@ -1704,6 +1762,76 @@ page {
             right: 0;
             transform: rotateZ(180deg);
 
+        }
+    }
+
+    .payment-methods {
+        padding: 0 40rpx 40rpx;
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 30rpx 20rpx;
+            margin-bottom: 20rpx;
+            background: rgba(61, 44, 25, 0.6);
+            border-radius: 20rpx;
+            position: relative;
+
+            &::after {
+                position: absolute;
+                border: 2rpx solid rgba(226, 204, 192, 0.4);
+                content: ' ';
+                height: calc(100% - 8rpx);
+                width: calc(100% - 8rpx);
+                top: 4rpx;
+                left: 4rpx;
+                border-radius: 16rpx;
+            }
+
+            .option-content {
+                display: flex;
+                align-items: center;
+                flex: 1;
+                position: relative;
+                z-index: 2;
+
+                .option-icon {
+                    width: 34rpx;
+                    height: 34rpx;
+                    margin-right: 30rpx;
+                }
+
+                .option-text {
+                    flex: 1;
+
+                    .option-title {
+                        font-size: 32rpx;
+                        color: #fff;
+                        margin-bottom: 10rpx;
+                    }
+
+                    .option-desc {
+                        font-size: 24rpx;
+                        color: #FFD390;
+
+                        &.insufficient-balance {
+                            color: #ff6b6b;
+                        }
+                    }
+                }
+            }
+
+            .option-arrow {
+                width: 30rpx;
+                height: 30rpx;
+                position: relative;
+                z-index: 2;
+            }
+
+            &:active {
+                opacity: 0.8;
+            }
         }
     }
 

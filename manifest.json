@@ -1,6 +1,6 @@
 {
     "name" : "启运阁",
-    "appid" : "__UNI__28D3A20",
+    "appid" : "__UNI__F09BF5D",
     "description" : "",
     "versionName" : "1.0.64",
     "versionCode" : 147,
@@ -106,13 +106,13 @@
                 "iosStyle" : "storyboard",
                 "androidStyle" : "default",
                 "android" : {
-                    "hdpi" : "D:/Desktop/兔子/苏总/assets/安卓和苹果的启动图/安卓/480x762.9.png",
-                    "xhdpi" : "D:/Desktop/兔子/苏总/assets/安卓和苹果的启动图/安卓/720x1242.9.png",
-                    "xxhdpi" : "D:/Desktop/兔子/苏总/assets/安卓和苹果的启动图/安卓/1080x1882.9.png"
+                    "hdpi" : "安卓和苹果的启动图/安卓/480x762.9.png",
+                    "xhdpi" : "安卓和苹果的启动图/安卓/720x1242.9.png",
+                    "xxhdpi" : "安卓和苹果的启动图/安卓/1080x1882.9.png"
                 },
                 "useOriginalMsgbox" : true,
                 "ios" : {
-                    "storyboard" : "D:/Desktop/兔子/苏总/assets/ios.zip"
+                    "storyboard" : "安卓和苹果的启动图/ios.zip"
                 }
             }
         },
