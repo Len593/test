@@ -1,7 +1,7 @@
 <!--
  * @Author: fujihang
  * @Date: 2025-01-26 16:27:26
- * @LastEditTime: 2025-06-29 16:43:18
+ * @LastEditTime: 2025-09-29 18:23:08
  * @Description: 聊天
 -->
 <template>
@@ -518,11 +518,13 @@ export default {
         this.targetMemberId = this.teachDetail.userId
         this.getMemberCloudByUserIdFN()
 
+        // 检查并等待融云引擎初始化
+        this.waitForEngineReady()
+
         if (options.chatRoomListId) {
             this.chatRoomListId = options.chatRoomListId
             setTimeout(() => {
                 this.getHistory()
-
             }, 200)
         } else {
             this.getRoomIdFN()
@@ -597,6 +599,65 @@ export default {
 
     },
     methods: {
+        // 检查融云引擎是否已初始化
+        checkEngineReady() {
+            try {
+                // 方法1: 通过getApp()获取全局应用实例（主要方法）
+                const app = getApp()
+                if (app && app.globalData && app.globalData.engine && app.globalData.engine.createTextMessage) {
+                    this.engine = app.globalData.engine
+                    console.log('通过全局数据获取到融云引擎')
+                    return true
+                }
+                
+                // 方法2: 通过Vue原型获取（备用方法）
+                if (this.$options.parent && this.$options.parent.constructor && this.$options.parent.constructor.prototype) {
+                    const VueConstructor = this.$options.parent.constructor
+                    if (VueConstructor.prototype.engine && VueConstructor.prototype.engine.createTextMessage) {
+                        this.engine = VueConstructor.prototype.engine
+                        console.log('通过Vue原型获取到融云引擎')
+                        return true
+                    }
+                }
+                
+                console.log('融云引擎未初始化')
+                return false
+            } catch (error) {
+                console.log('检查引擎状态时出错:', error)
+                return false
+            }
+        },
+        
+        // 等待融云引擎初始化完成
+        waitForEngineReady() {
+            let attempts = 0
+            const maxAttempts = 30 // 最多等待30秒
+            
+            const checkEngine = () => {
+                attempts++
+                console.log(`第${attempts}次检查融云引擎状态...`)
+                
+                if (this.checkEngineReady()) {
+                    console.log('融云引擎初始化完成')
+                    return
+                }
+                
+                if (attempts >= maxAttempts) {
+                    console.log('融云引擎初始化超时')
+                    uni.showToast({
+                        title: '聊天功能初始化失败，请重新进入',
+                        icon: 'none'
+                    })
+                    return
+                }
+                
+                // 每秒检查一次
+                setTimeout(checkEngine, 1000)
+            }
+            
+            checkEngine()
+        },
+        
         toFN(url) {
             console.log(url,'---2232');
             
@@ -1107,93 +1168,115 @@ export default {
             console.log(this.chatLimit, '--chatLimit-');
             console.log(this.chatTimeout, '--chatTimeout-');
 
+            // 检查融云引擎是否已初始化
+            if (!this.checkEngineReady()) {
+                uni.showToast({
+                    title: '聊天功能正在初始化，请稍后重试',
+                    icon: 'none'
+                })
+                return
+            }
 
             if (this.chatLimit <= 0 && (!this.chatTimeout || new Date().getTime() > this.chatTimeout)) return uni.showToast({
                 title: '已超过免费聊天次数',
                 icon: 'none'
             })
 
-
-
-
             if (this.showInput) {//发送文本
                 if (!this.inputVal) return
-                let message = await this.engine.createTextMessage(
-                    1,
-                    this.cloudUserId,
-                    null,
-                    this.inputVal,
-                );
-                let callback = {
-                    onMessageSaved: (res) => {
-                        //...
-                        that.addChatFN({
-                            chatMessageType: 2,
-                            chatText: that.inputVal,
-                            sentTime: res.message.sentTime
-                        })
-                    },
-                    onMessageSent: (res) => {
-                        //...
-                        if (res.code == 0) {
-                            this.inputVal = ''
-                        } else {
-                            uni.showToast({
-                                title: '发送信息失败',
-                                icon: 'none'
+                try {
+                    let message = await this.engine.createTextMessage(
+                        1,
+                        this.cloudUserId,
+                        null,
+                        this.inputVal,
+                    );
+                    let callback = {
+                        onMessageSaved: (res) => {
+                            //...
+                            that.addChatFN({
+                                chatMessageType: 2,
+                                chatText: that.inputVal,
+                                sentTime: res.message.sentTime
                             })
+                        },
+                        onMessageSent: (res) => {
+                            //...
+                            if (res.code == 0) {
+                                this.inputVal = ''
+                            } else {
+                                uni.showToast({
+                                    title: '发送信息失败',
+                                    icon: 'none'
+                                })
+                            }
                         }
-                    }
-                };
-                let code = await this.engine.sendMessage(message, callback);
+                    };
+                    let code = await this.engine.sendMessage(message, callback);
+                } catch (error) {
+                    console.log('发送文本消息失败:', error)
+                    uni.showToast({
+                        title: '发送失败，请重试',
+                        icon: 'none'
+                    })
+                }
             } else {
                 if (!this.voicePath) return
-                let path = 'file:///' + plus.io.convertLocalFileSystemURL(this.voicePath), that = this
-                let message = await this.engine.createVoiceMessage(1, this.cloudUserId, null, path, this.time);
-                let listener = {
-                    onMediaMessageSaved: (res) => {
-                        //...
-
-
-                    },
-                    onMediaMessageSending: (res) => {
-                        //...
-                        uni.showLoading({
-                            title: '发送中...',
-                            icon: 'none'
-                        });
-                        console.log('onMediaMessageSending:', res);
-
-                    },
-                    onSendingMediaMessageCanceled: (res) => {
-                        //...
-                        console.log('onSendingMediaMessageCanceled:', res);
-
-                    },
-                    onMediaMessageSent: (res) => {
-                        //...
-                        console.log(res, '---onMediaMessageSent--');
-
-                        uni.hideLoading()
-                        that.addChatFN({
-                            chatMessageType: 3,
-                            sentTime: res.message.sentTime,
-                            chatMessageUrl: res.message.remote,
-                            chatMessageTime: that.time
-                        })
-                        that.cancalFN()
-
-                    }
-                };
-                let code = await this.engine.sendMediaMessage(message, listener);
-
-
+                try {
+                    let path = 'file:///' + plus.io.convertLocalFileSystemURL(this.voicePath), that = this
+                    let message = await this.engine.createVoiceMessage(1, this.cloudUserId, null, path, this.time);
+                    let listener = {
+                        onMediaMessageSaved: (res) => {
+                            //...
+                        },
+                        onMediaMessageSending: (res) => {
+                            //...
+                            uni.showLoading({
+                                title: '发送中...',
+                                icon: 'none'
+                            });
+                            console.log('onMediaMessageSending:', res);
+                        },
+                        onSendingMediaMessageCanceled: (res) => {
+                            //...
+                            console.log('onSendingMediaMessageCanceled:', res);
+                        },
+                        onMediaMessageSent: (res) => {
+                            //...
+                            console.log(res, '---onMediaMessageSent--');
+                            uni.hideLoading()
+                            that.addChatFN({
+                                chatMessageType: 3,
+                                sentTime: res.message.sentTime,
+                                chatMessageUrl: res.message.remote,
+                                chatMessageTime: that.time
+                            })
+                            that.cancalFN()
+                        }
+                    };
+                    let code = await this.engine.sendMediaMessage(message, listener);
+                } catch (error) {
+                    console.log('发送语音消息失败:', error)
+                    uni.showToast({
+                        title: '发送失败，请重试',
+                        icon: 'none'
+                    })
+                }
             }
             this.getUserChatPermissionFN()
-
         },
         funFn(sourceType) {
             let that = this
+            
+            // 检查引擎是否就绪
+            if (!this.checkEngineReady()) {
+                uni.showToast({
+                    title: '聊天功能正在初始化，请稍后重试',
+                    icon: 'none'
+                })
+                return
+            }
+            
             switch (sourceType) {
                 case 'album':
                     uni.chooseImage({
@@ -1201,42 +1284,46 @@ export default {
                         sourceType: [sourceType],
                         success: async (res) => {
                             if (res.tempFilePaths.length < 0) return;
-                            //转为平台路径
-                            let path = 'file:///' + plus.io.convertLocalFileSystemURL(res.tempFilePaths[0])
-                            //创建图片消息
-                            let message = await this.engine.createImageMessage(1, this.cloudUserId, null, path);
-                            let listener = {
-                                onMediaMessageSaved: (res) => {
-                                    //...
-                                    console.log('onMediaMessageSaved:', res);
-
-                                },
-                                onMediaMessageSending: (res) => {
-                                    //...
-                                    uni.showLoading({
-                                        title: '发送中...',
-                                        icon: 'none'
-                                    });
-                                    console.log('onMediaMessageSending:', res);
-
-                                },
-                                onSendingMediaMessageCanceled: (res) => {
-                                    //...
-                                    console.log('onSendingMediaMessageCanceled:', res);
-
-                                },
-                                onMediaMessageSent: (res) => {
-                                    //...
-                                    uni.hideLoading()
-                                    that.addChatFN({
-                                        chatMessageType: 4,
-                                        sentTime: res.message.sentTime,
-                                        chatImgUrl: res.message.remote
-                                    })
-
-                                }
-                            };
-                            let code = await this.engine.sendMediaMessage(message, listener);
+                            try {
+                                //转为平台路径
+                                let path = 'file:///' + plus.io.convertLocalFileSystemURL(res.tempFilePaths[0])
+                                //创建图片消息
+                                let message = await this.engine.createImageMessage(1, this.cloudUserId, null, path);
+                                let listener = {
+                                    onMediaMessageSaved: (res) => {
+                                        //...
+                                        console.log('onMediaMessageSaved:', res);
+                                    },
+                                    onMediaMessageSending: (res) => {
+                                        //...
+                                        uni.showLoading({
+                                            title: '发送中...',
+                                            icon: 'none'
+                                        });
+                                        console.log('onMediaMessageSending:', res);
+                                    },
+                                    onSendingMediaMessageCanceled: (res) => {
+                                        //...
+                                        console.log('onSendingMediaMessageCanceled:', res);
+                                    },
+                                    onMediaMessageSent: (res) => {
+                                        //...
+                                        uni.hideLoading()
+                                        that.addChatFN({
+                                            chatMessageType: 4,
+                                            sentTime: res.message.sentTime,
+                                            chatImgUrl: res.message.remote
+                                        })
+                                    }
+                                };
+                                let code = await this.engine.sendMediaMessage(message, listener);
+                            } catch (error) {
+                                console.log('发送图片消息失败:', error)
+                                uni.showToast({
+                                    title: '发送失败，请重试',
+                                    icon: 'none'
+                                })
+                            }
                         },
                         fail: err => {
                             if (err.errMsg.includes('cancel')) return
@@ -1263,43 +1350,47 @@ export default {
                         sourceType: [sourceType],
                         success: async (res) => {
                             if (res.tempFilePaths.length < 0) return;
-                            //转为平台路径
-                            let path = 'file:///' + plus.io.convertLocalFileSystemURL(res.tempFilePaths[0])
-                            //创建图片消息
-                            let message = await this.engine.createImageMessage(1, this.cloudUserId, null, path);
-                            let listener = {
-                                onMediaMessageSaved: (res) => {
-                                    //...
-                                    console.log('onMediaMessageSaved:', res);
-
-                                },
-                                onMediaMessageSending: (res) => {
-                                    //...
-                                    uni.showLoading({
-                                        title: '发送中...',
-                                        icon: 'none'
-                                    });
-                                    console.log('onMediaMessageSending:', res);
-
-                                },
-                                onSendingMediaMessageCanceled: (res) => {
-                                    //...
-                                    console.log('onSendingMediaMessageCanceled:', res);
-
-                                },
-                                onMediaMessageSent: (res) => {
-                                    //...
-                                    uni.hideLoading()
-                                    that.addChatFN({
-                                        chatMessageType: 4,
-                                        sentTime: res.message.sentTime,
-                                        chatImgUrl: res.message.remote
-                                    })
-                                    console.log('onMediaMessageSent:', res);
-
-                                }
-                            };
-                            let code = await this.engine.sendMediaMessage(message, listener);
+                            try {
+                                //转为平台路径
+                                let path = 'file:///' + plus.io.convertLocalFileSystemURL(res.tempFilePaths[0])
+                                //创建图片消息
+                                let message = await this.engine.createImageMessage(1, this.cloudUserId, null, path);
+                                let listener = {
+                                    onMediaMessageSaved: (res) => {
+                                        //...
+                                        console.log('onMediaMessageSaved:', res);
+                                    },
+                                    onMediaMessageSending: (res) => {
+                                        //...
+                                        uni.showLoading({
+                                            title: '发送中...',
+                                            icon: 'none'
+                                        });
+                                        console.log('onMediaMessageSending:', res);
+                                    },
+                                    onSendingMediaMessageCanceled: (res) => {
+                                        //...
+                                        console.log('onSendingMediaMessageCanceled:', res);
+                                    },
+                                    onMediaMessageSent: (res) => {
+                                        //...
+                                        uni.hideLoading()
+                                        that.addChatFN({
+                                            chatMessageType: 4,
+                                            sentTime: res.message.sentTime,
+                                            chatImgUrl: res.message.remote
+                                        })
+                                        console.log('onMediaMessageSent:', res);
+                                    }
+                                };
+                                let code = await this.engine.sendMediaMessage(message, listener);
+                            } catch (error) {
+                                console.log('发送拍照消息失败:', error)
+                                uni.showToast({
+                                    title: '发送失败，请重试',
+                                    icon: 'none'
+                                })
+                            }
                         },
                         fail: err => {
                             if (err.errMsg.includes('cancel')) return

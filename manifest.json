@@ -2,8 +2,8 @@
     "name" : "启运阁",
     "appid" : "__UNI__F09BF5D",
     "description" : "",
-    "versionName" : "1.0.66",
-    "versionCode" : 148,
+    "versionName" : "1.0.71",
+    "versionCode" : 151,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -18,6 +18,12 @@
         },
         "compatible" : {
             "ignoreVersion" : true //true表示忽略版本检查提示框，HBuilderX1.9.0及以上版本支持  
+        },
+        "safearea" : {
+            "background" : "#19181E",
+            "bottom" : {
+                "offset" : "auto"
+            }
         },
         /* 模块配置 */
         "modules" : {

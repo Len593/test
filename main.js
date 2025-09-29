@@ -1,7 +1,7 @@
 /*
  * @Author: fujihang
  * @Date: 2023-04-07 15:12:06
- * @LastEditTime: 2025-06-15 19:06:49
+ * @LastEditTime: 2025-09-29 18:23:11
  * @Description: 
  */
 import App from './App'
@@ -133,9 +133,16 @@ function akc() {
       let optionsSW = {}
 
       RCIMIWEngine.create(appKey, optionsSW).then((res) => {
-        // console.log('初始化引擎融云res---')
+        console.log('初始化引擎融云res---')
         Vue.prototype.engine = res
-
+        
+        // 同时存储到全局数据中，方便页面访问
+        const app = getApp()
+        if (app) {
+          app.globalData = app.globalData || {}
+          app.globalData.engine = res
+          console.log('融云引擎已存储到全局数据')
+        }
 
         if (uni.getStorageSync('memberCloudToken')) {
           Vue.prototype.connectFN(uni.getStorageSync('memberCloudToken'), Vue.prototype)
@@ -186,9 +193,16 @@ Vue.prototype.akcFN = () => {
 
       let optionsSW = {}
       RCIMIWEngine.create(appKey, optionsSW).then(async (res) => {
-
+        console.log('akcFN: 初始化引擎融云res---')
         Vue.prototype.engine = res
-
+        
+        // 同时存储到全局数据中，方便页面访问
+        const app = getApp()
+        if (app) {
+          app.globalData = app.globalData || {}
+          app.globalData.engine = res
+          console.log('akcFN: 融云引擎已存储到全局数据')
+        }
 
         Vue.prototype.connectFN(uni.getStorageSync('memberCloudToken'), Vue.prototype)
 

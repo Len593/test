@@ -94,7 +94,9 @@ export default {
 
     background: #19181E;
     // bottom: 30rpx;
-    bottom: -2rpx;
+    bottom: 0;
+    padding-bottom: constant(safe-area-inset-bottom); /* iOS 11.0 */
+    padding-bottom: env(safe-area-inset-bottom); /* iOS 11.2+ */
     justify-content: space-around;
     height: 170rpx;
     padding: 0 26rpx;

@@ -8,6 +8,9 @@
 <script>
 export default {
 	onLaunch: function () {
+		// 初始化全局数据
+		this.globalData = this.globalData || {}
+		
 		setTimeout(() => {
 
 			// uni.loadFontFace({
@@ -81,6 +84,8 @@ page {
 	overflow: hidden;
 	position: relative;
 	font-family: 'jt';
+	padding-bottom: constant(safe-area-inset-bottom); /* iOS 11.0 */
+	padding-bottom: env(safe-area-inset-bottom); /* iOS 11.2+ */
 
 }
 
