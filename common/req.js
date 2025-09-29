@@ -53,7 +53,7 @@ const reqFN = ({ url, data = {}, method = 'POST',showLoading }) => {
                         
                         uni.showModal({
                             title: '提示',
-                            content: '登录已过期，请重新登录',
+                            content: '您尚未登录，请登录',
                             showCancel: false,
                             success: ({ confirm, cancel }) => {
                                 if(confirm){
